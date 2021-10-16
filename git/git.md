@@ -113,6 +113,21 @@ git push --force
 git push -h
 ```
 
+### git submodule
+
+这是一个很奇怪的概念。操作是一个子模块 安插在你的项目里，并且起到一定的作用（例如 hugo 的主题模块等）
+
+同时 submodule 本身也是作为一个 git repo 存在的
+
+你可能会说
+> 啊 这都一样啊 为什么不直接使用那个 仓库 的 git 把它直接塞进去呢？
+
+这里有两个问题
+
+1. 你不能在 git 下使用两个 带.git文件夹的资料 submodule 会将子项目（子模块）的.git变更为文件 指向主仓库的模块 并且创建 .gitmodule 用以维护
+2. 子模块可以随时跟着 子模块的仓库的更新进行更新
+
+
 ## Commit & Branch 基础使用的小游戏
 
 https://learngitbranching.js.org/?locale=zh_CN (这是中文版的)
@@ -125,7 +140,6 @@ https://learngitbranching.js.org/?locale=zh_CN (这是中文版的)
 - branch 更像一个对 commit 的引用操作
 - fork 几乎可以是完全分离 有一些分家的意味 但也可以用来 提 pull Request 为项目提交改变
 
-=======
 ## Commit & Branch 等基础使用
 
 https://learngitbranching.js.org/?locale=zh_CN (这是中文版的)
@@ -156,5 +170,27 @@ AngularJS 的 git 规范 是使用较为广泛的规范
 文章: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.uyo6cb12dt6w 
 
 
+## git 源代码安全
 
+根据上文，有提及 git 的原理是代码文件的二进制对象存储和压缩。
+
+所以根据这些这些可以完整的恢复出目录的结构与内容 导致整个项目的源代码的泄露
+
+后端要注意在部署环境时需要注意泄露问题 并且将 /.git/ 加入 403 Forbidden 名单
+
+例如：
+> .git/HEAD 当前 git 头指向的一半是下一行的
+> .git/refs/heads/ 分支头 会解释每个分支头的 hash
+> .git/objects/ 存储各种 二进制对象
+
+例如
+
+```
+└─[$] <git:(eson_dev)> cat .git/refs/heads/eson_dev 
+58d6c9ae97405490619d15cdde4fe5d1d97976ed
+└─[$] <git:(eson_dev)> cat .git/objects/58/d6c9ae97405490619d15cdde4fe5d1d97976ed 
+x?? <binary objects>
+```
+
+存储二进制的格式又是公开的标准 所以相关的工具很多。
 
